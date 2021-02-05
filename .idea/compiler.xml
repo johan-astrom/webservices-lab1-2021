@@ -6,7 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="webservices-lab1-2021" />
+        <module name="plugin" />
+        <module name="core" />
+        <module name="spi" />
       </profile>
     </annotationProcessing>
   </component>
