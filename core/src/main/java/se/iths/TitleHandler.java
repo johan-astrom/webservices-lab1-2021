@@ -1,9 +1,15 @@
 package se.iths;
 
+import se.iths.IO.HttpResponse;
+
+import java.net.HttpCookie;
+import java.net.Socket;
+
 public class TitleHandler implements UrlHandler {
 
+
     @Override
-    public String handlerUrl() {
-        return "this is title handler";
+    public void handlerUrl() {
+
     }
 }

@@ -1,17 +1,13 @@
 package se.iths;
 
 import se.iths.IO.HttpResponse;
-import se.iths.IO.IOhandler;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
-
-import static java.nio.file.Files.probeContentType;
 
 public class Server {
 
@@ -75,14 +71,10 @@ public class Server {
             String url = header[1];
             UrlHandler urlHandler = route.get(url);
             if (urlHandler != null) {
-                System.out.println(urlHandler.handlerUrl());
-            }
-            else if (url.equals("/")){
-                url = "/index.html";
-                HttpResponse.printHeader(socket, url); 
+                urlHandler.handlerUrl();
             }
             else {
-                HttpResponse.printHeader(socket, url);
+               HttpResponse.printResponse(socket, url);
             }
 
             System.out.println(header[0]);
