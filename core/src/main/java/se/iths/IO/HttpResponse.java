@@ -13,7 +13,7 @@ public class HttpResponse {
         try {
             System.out.println("Url =" + url);
 
-            if(url.equals("/")){
+            if (url.equals("/")) {
                 url = "/index.html";
             }
 
@@ -21,8 +21,8 @@ public class HttpResponse {
             PrintWriter output = new PrintWriter(socket.getOutputStream());
 
             if (!file.exists()) {
-               printPageNotFound(output);
-               return;
+                printPageNotFound(output);
+                return;
             }
 
             byte[] page = IOhandler.readFromFile(file);
