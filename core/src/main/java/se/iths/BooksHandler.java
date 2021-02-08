@@ -3,7 +3,6 @@ package se.iths;
 import se.iths.jpa.Book;
 import se.iths.jpa.BookDAO;
 import se.iths.jpa.BookDAOWithJPAImpl;
-import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class BooksHandler implements UrlHandler {
         BookDAO bdao = new BookDAOWithJPAImpl();
         List<Book> allBooks = bdao.getAllBooks();
 
-        jsonSide(ConvertJson.convertTojson(allBooks));
+        jsonSide(ConvertJson.convertToJson(allBooks));
 
 
     }
