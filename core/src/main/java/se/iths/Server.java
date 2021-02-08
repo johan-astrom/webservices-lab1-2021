@@ -1,5 +1,6 @@
 package se.iths;
 
+import se.iths.IO.HttpResponse;
 import se.iths.IO.IOhandler;
 
 import java.io.*;
@@ -67,6 +68,7 @@ public class Server {
 
 
             Map<String, UrlHandler> route = new HashMap<>();
+
             route.put("/author.html", new AuthorHandler());
             route.put("/title.html", new TitleHandler());
 
@@ -75,7 +77,13 @@ public class Server {
             if (urlHandler != null) {
                 System.out.println(urlHandler.handlerUrl());
             }
-
+            else if (url.equals("/")){
+                url = "/index.html";
+                HttpResponse.printHeader(socket, url); 
+            }
+            else {
+                HttpResponse.printHeader(socket, url);
+            }
 
             System.out.println(header[0]);
 
@@ -87,26 +95,6 @@ public class Server {
                     break;
                 }
 */
-                var output = new PrintWriter(socket.getOutputStream());
-
-                System.out.println(url);
-
-                File file = new File("core" + File.separator + "web" + url);
-                byte[] page = IOhandler.readFromFile(file);
-
-                String type = Files.probeContentType(file.toPath());
-
-                output.println("HTTP/1.1 200 OK");
-                output.println("Content-Length:" + page.length);
-                output.println("Content-Type:" + type);
-                output.println("");
-
-                //output.print(page);
-                output.flush();
-
-                var dataOut = new BufferedOutputStream(socket.getOutputStream());
-                dataOut.write(page);
-                dataOut.flush();
 
            // }
 
