@@ -65,8 +65,9 @@ public class Server {
 
             Map<String, UrlHandler> route = new HashMap<>();
 
-            route.put("/author.html", new AuthorHandler());
+           route.put("/author.html", new AuthorHandler());
             route.put("/title.html", new TitleHandler());
+            route.put("/Books", new BooksHandler());
 
             String url = header[1];
             UrlHandler urlHandler = route.get(url);
