@@ -30,6 +30,8 @@ public class BookDAOWithJPAImpl implements BookDAO {
         em.getTransaction().begin();
         Book book = new Book(isbn13, title, genre, price);
         System.out.println("Book created");
+        em.persist(book);
+        em.getTransaction().commit();
 
     }
 }

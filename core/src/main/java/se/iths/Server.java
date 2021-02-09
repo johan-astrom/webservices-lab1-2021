@@ -1,7 +1,7 @@
 package se.iths;
 
 import se.iths.IO.HttpResponse;
-
+import se.iths.jpa.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -56,6 +56,31 @@ public class Server {
 
                 case "POST":
                     System.out.println("Hämta POST metod");
+                    while (true) {
+                        headerLine = input.readLine();
+
+                        if (headerLine.isEmpty()) {
+                            break;
+                        }
+                    }
+
+                    String bodyLine = new String(input.readLine());
+
+                    String[] body = bodyLine.split("&");
+
+                    System.out.println(bodyLine);
+
+                    long isbn13 = Long.parseLong(body[0].substring(body[0].indexOf("=") + 1));
+                    String title = body[1].substring(body[1].indexOf("=") + 1);
+                    String genre = body[2].substring(body[2].indexOf("=") + 1);
+                    double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
+
+                    System.out.println(isbn13 + " " + title + " " + genre + " " + price);
+
+                    BookDAO book = new BookDAOWithJPAImpl();
+
+                    book.create(isbn13, title, genre, price);
+
                     break;
 
                 default:
@@ -65,7 +90,7 @@ public class Server {
 
             Map<String, UrlHandler> route = new HashMap<>();
 
-           route.put("/author.html", new AuthorHandler());
+            route.put("/author.html", new AuthorHandler());
             route.put("/title.html", new TitleHandler());
             route.put("/Books", new BooksHandler());
 
@@ -73,23 +98,14 @@ public class Server {
             UrlHandler urlHandler = route.get(url);
             if (urlHandler != null) {
                 urlHandler.handlerUrl();
-            }
-            else {
-               HttpResponse.printResponse(socket, url);
+            } else {
+                HttpResponse.printResponse(socket, url);
             }
 
             System.out.println(header[0]);
 
 
-          /*  while (true) {
-                headerLine = input.readLine();
-
-                if (headerLine.isEmpty()) {
-                    break;
-                }
-*/
-
-           // }
+            // }
 
 
             socket.close();
