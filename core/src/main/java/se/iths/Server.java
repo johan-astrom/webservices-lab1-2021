@@ -56,6 +56,7 @@ public class Server {
 
                 case "POST":
                     System.out.println("Hämta POST metod");
+
                     while (true) {
                         headerLine = input.readLine();
 
@@ -64,7 +65,7 @@ public class Server {
                         }
                     }
 
-                    String bodyLine = new String(input.readLine());
+                    String bodyLine = input.readLine();
 
                     String[] body = bodyLine.split("&");
 
@@ -90,9 +91,9 @@ public class Server {
 
             Map<String, UrlHandler> route = new HashMap<>();
 
-            route.put("/author.html", new AuthorHandler());
-            route.put("/title.html", new TitleHandler());
-            route.put("/Books", new BooksHandler());
+            route.put("/author", new AuthorHandler(socket));
+            route.put("/title", new TitleHandler(socket));
+            route.put("/books", new BooksHandler(socket));
 
             String url = header[1];
             UrlHandler urlHandler = route.get(url);
@@ -105,7 +106,7 @@ public class Server {
             System.out.println(header[0]);
 
 
-            // }
+
 
 
             socket.close();

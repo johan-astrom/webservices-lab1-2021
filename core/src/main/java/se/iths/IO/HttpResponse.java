@@ -52,6 +52,7 @@ public class HttpResponse {
         var dataOut = new BufferedOutputStream(socket.getOutputStream());
         dataOut.write(page);
         dataOut.flush();
+
     }
 
     private static void printPageNotFound(PrintWriter output) {

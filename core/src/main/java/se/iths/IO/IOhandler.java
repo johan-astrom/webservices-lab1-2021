@@ -2,6 +2,7 @@ package se.iths.IO;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class IOhandler {
@@ -18,5 +19,17 @@ public class IOhandler {
             }
         }
         return content;
+    }
+
+    public static void FileWriter(String url, String result) {
+        try {
+            FileWriter myWriter = new FileWriter("core" + File.separator + "web" + url);
+            myWriter.write(result);
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 }
