@@ -1,4 +1,4 @@
-package se.iths.IO;
+package se.iths.io;
 
 import java.io.File;
 import java.io.FileInputStream;

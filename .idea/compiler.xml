@@ -6,9 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="plugin" />
         <module name="core" />
+        <module name="persistence" />
+        <module name="plugin" />
         <module name="spi" />
+        <module name="IO" />
       </profile>
     </annotationProcessing>
   </component>

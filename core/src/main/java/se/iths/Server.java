@@ -1,7 +1,12 @@
 package se.iths;
 
-import se.iths.IO.HttpResponse;
-import se.iths.jpa.*;
+import se.iths.io.HttpResponse;
+import se.iths.persistence.BookDAO;
+import se.iths.persistence.BookDAOWithJPAImpl;
+import se.iths.plugin.BooksHandler;
+import se.iths.plugin.TitleHandler;
+import se.iths.spi.UrlHandler;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -44,43 +49,23 @@ public class Server {
 
             String[] header = headerLine.split(" ");
 
+            boolean isHead = true;
+
             switch (header[0]) {
 
                 case "GET":
+                    isHead = false;
                     System.out.println("Hämta GET klass");
                     break;
 
                 case "HEAD":
+                    isHead = true;
                     System.out.println("Hämta HEAD metod");
                     break;
 
                 case "POST":
                     System.out.println("Hämta POST metod");
-
-                    while (true) {
-                        headerLine = input.readLine();
-
-                        if (headerLine.isEmpty()) {
-                            break;
-                        }
-                    }
-
-                    String bodyLine = input.readLine();
-
-                    String[] body = bodyLine.split("&");
-
-                    System.out.println(bodyLine);
-
-                    long isbn13 = Long.parseLong(body[0].substring(body[0].indexOf("=") + 1));
-                    String title = body[1].substring(body[1].indexOf("=") + 1);
-                    String genre = body[2].substring(body[2].indexOf("=") + 1);
-                    double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
-
-                    System.out.println(isbn13 + " " + title + " " + genre + " " + price);
-
-                    BookDAO book = new BookDAOWithJPAImpl();
-
-                    book.create(isbn13, title, genre, price);
+                    postRequest(input);
 
                     break;
 
@@ -91,7 +76,6 @@ public class Server {
 
             Map<String, UrlHandler> route = new HashMap<>();
 
-            route.put("/author", new AuthorHandler(socket));
             route.put("/title", new TitleHandler(socket));
             route.put("/books", new BooksHandler(socket));
 
@@ -100,14 +84,10 @@ public class Server {
             if (urlHandler != null) {
                 urlHandler.handlerUrl();
             } else {
-                HttpResponse.printResponse(socket, url);
+                HttpResponse.printResponse(socket, url, isHead);
             }
 
             System.out.println(header[0]);
-
-
-
-
 
             socket.close();
 
@@ -116,6 +96,34 @@ public class Server {
         }
 
 
+    }
+
+    private static void postRequest(BufferedReader input) throws IOException {
+        String headerLine;
+        while (true) {
+            headerLine = input.readLine();
+
+            if (headerLine.isEmpty()) {
+                break;
+            }
+        }
+
+        String bodyLine = input.readLine();
+
+        String[] body = bodyLine.split("&");
+
+        System.out.println(bodyLine);
+
+        long isbn13 = Long.parseLong(body[0].substring(body[0].indexOf("=") + 1));
+        String title = body[1].substring(body[1].indexOf("=") + 1);
+        String genre = body[2].substring(body[2].indexOf("=") + 1);
+        double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
+
+        System.out.println(isbn13 + " " + title + " " + genre + " " + price);
+
+        BookDAO book = new BookDAOWithJPAImpl();
+
+        book.create(isbn13, title, genre, price);
     }
 
 

@@ -1,15 +1,22 @@
-package se.iths;
+package se.iths.plugin;
 
-import se.iths.IO.HttpResponse;
-import se.iths.IO.IOhandler;
-import se.iths.jpa.Book;
-import se.iths.jpa.BookDAO;
-import se.iths.jpa.BookDAOWithJPAImpl;
+
+import se.iths.io.HttpResponse;
+import se.iths.io.IOhandler;
+
+import se.iths.persistence.Book;
+import se.iths.persistence.BookDAO;
+import se.iths.persistence.BookDAOWithJPAImpl;
+import se.iths.spi.UrlHandler;
 
 import java.net.Socket;
 import java.util.List;
 
 public class TitleHandler implements UrlHandler {
+
+    public TitleHandler() {
+    }
+
     private Socket socket;
 
     public TitleHandler(Socket socket) {
@@ -33,7 +40,7 @@ public class TitleHandler implements UrlHandler {
         IOhandler.FileWriter(url, result);
 
 
-        HttpResponse.printResponse(socket, url);
+        HttpResponse.printResponse(socket, url, false);
     }
 
 }

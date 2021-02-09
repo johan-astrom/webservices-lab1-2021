@@ -1,4 +1,4 @@
-package se.iths;
+package se.iths.plugin;
 import com.google.gson.Gson;
 import java.util.List;
 

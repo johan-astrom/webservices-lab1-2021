@@ -12,12 +12,21 @@
         <module>core</module>
         <module>spi</module>
         <module>plugin</module>
+        <module>IO</module>
+        <module>persistence</module>
     </modules>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
-    </properties>
+            <revision>1.0.0-SNAPSHOT</revision>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <java.version>15</java.version>
+            <maven.compiler.source>${java.version}</maven.compiler.source>
+            <maven.compiler.target>${java.version}</maven.compiler.target>
+            <maven.compiler.release>${java.version}</maven.compiler.release>
+            <junit>5.7.0</junit>
+        </properties>
 
     <dependencies>
     <dependency>

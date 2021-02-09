@@ -1,4 +1,4 @@
-package se.iths.IO;
+package se.iths.io;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,7 +9,8 @@ import java.nio.file.Files;
 
 public class HttpResponse {
 
-    public static void printResponse(Socket socket, String url) {
+    public static void printResponse(Socket socket, String url, boolean isHead) {
+
         try {
             System.out.println("Url =" + url);
 
@@ -29,8 +30,10 @@ public class HttpResponse {
 
             printHeaderLines(output, file, page);
 
-            printBody(socket, page);
+            if (!isHead) {
+                printBody(socket, page);
 
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

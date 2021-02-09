@@ -1,4 +1,4 @@
-package se.iths.jpa;
+package se.iths.persistence;
 
 import java.util.List;
 

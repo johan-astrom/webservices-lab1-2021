@@ -1,4 +1,4 @@
-package se.iths.jpa;
+package se.iths.persistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
