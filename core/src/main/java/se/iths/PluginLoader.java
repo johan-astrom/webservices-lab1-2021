@@ -8,7 +8,8 @@ public class PluginLoader {
 
     public static ServiceLoader<UrlHandler> findUrlHandlers(){
 
-        //laddar in alla plugins
+        //ServiceLoader går in i klassen UrlHandler och söker efter
+        // alla våra plugins och laddar in alla plugins. Returnerar dem
         ServiceLoader<UrlHandler> loader = ServiceLoader.load(UrlHandler.class);
 
         return loader;

@@ -21,6 +21,7 @@ public class IOhandler {
         return content;
     }
 
+    //Skriver till listan title.txt
     public static void FileWriter(String url, String result) {
         try {
             FileWriter myWriter = new FileWriter(".." + File.separator + "web" + url);

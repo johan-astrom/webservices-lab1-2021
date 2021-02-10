@@ -26,22 +26,28 @@ public class HttpResponse {
         try {
             System.out.println("Url =" + url);
 
+            //Urln sätts till /index.html om den är /
             if (url.equals("/")) {
                 url = "/index.html";
             }
 
+            //Skapar objektet file
             File file = new File(".." + File.separator + "web" + url);
             //File file = new File("core" + File.separator + "web" + url);
 
+            //Finns inte filen anropas 404
             if (!file.exists()) {
                 this.header = printPageNotFound();
                 return;
             }
 
-            //bodyn = byte arrayen som vi läst av filen som vi  angett urln till
+            //existerar filen läses bodyn in
+            //bodyn = bytearrayen som vi läst av filen som vi  angett urln till
             this.body = IOhandler.readFromFile(file);
 
+            //probecontenttype hittar vilken typ av fil och returnerar den
             String type = Files.probeContentType(file.toPath());
+            //sätter headern till den typen
             this.header = printHeaderLines(type);
 
         } catch (IOException e) {
@@ -50,16 +56,15 @@ public class HttpResponse {
 
     }
 
+    //Metod för utskrift json
     public void printJsonResponse(String json){
-
         this.header = printHeaderLines("application/json");
-
         this.body=json.getBytes(StandardCharsets.UTF_8);
 
     }
 
+    //sb bygger ihop en sträng och returnerar den för utskrift
     private String printHeaderLines(String type) {
-
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK\r\n");
         sb.append("Content-Length:" + this.body.length + "\r\n");

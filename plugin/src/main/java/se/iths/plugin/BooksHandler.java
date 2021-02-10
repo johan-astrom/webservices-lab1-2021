@@ -37,6 +37,7 @@ public class BooksHandler implements UrlHandler {
 
         List<Book> allBooks = bdao.getAllBooks();
 
+        //objektet konverteras till json och skrivs ut i metoden printJsonResponse
         httpResponse.printJsonResponse(ConvertJson.convertToJson(allBooks));
 
         return httpResponse;

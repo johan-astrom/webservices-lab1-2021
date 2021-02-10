@@ -15,41 +15,42 @@ import java.util.concurrent.*;
 
 public class Server {
 
+    //Deklarerat en map för att hantera flera förfrågningar,
+    // som vi ska kunna nå senare i koden. Sparas i par key och value från UrlHandler, sparas som routes.
     private static Map<String, UrlHandler> route;
-//Deklarerat en map som vi ska kunna nå senare i koden. Sparas i par.
 
     public static void main(String[] args) {
 
+        //Trådar skapas
         ExecutorService executorService = Executors.newCachedThreadPool();
-//Trådar skapas
 
         try {
+            //Servern startar
             ServerSocket serverSocket = new ServerSocket(7050);
-//Servern startar
 
+            //Initieras en hash map för våra routes
             route = new HashMap<>();
-//initieras hash map
 
+            //Klassen PluginLoader anropar findUrlHandlers som söker plugins, sparas i
+            //en serviceloader
             var loader = PluginLoader.findUrlHandlers();
-//anropas plugins och sparar i en service loader
 
+            //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
             for (var handler : loader){
                 route.put(handler.getRoute(), handler);
-                //Går igenom service loader
             }
 
             while (true) {
 
+                //Klienten ansluter till servern, skickar socket till handleConnection();
                 Socket socket = serverSocket.accept();
                 executorService.execute(() -> handleConnection(socket));
 
             }
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -78,7 +79,6 @@ public class Server {
                 case "POST":
                     System.out.println("Hämta POST metod");
                     postRequest(input);
-
                     break;
 
                 default:
@@ -86,13 +86,11 @@ public class Server {
             }
 
 
-
-
-            String url = header[1];
-
             //hämtar en url handler från vår Map
             //Här bestäms vilken klass som vi hämtar (bookhandler eller titlehandler)
-            UrlHandler urlHandler = route.get(url);
+            String url = header[1];
+
+          UrlHandler urlHandler = route.get(url);
             HttpResponse httpResponse;
             if (urlHandler != null) {
                 httpResponse = urlHandler.handlerUrl();
@@ -100,6 +98,7 @@ public class Server {
                 //HttpResponse.printResponse(socket, url, isHead);
                 httpResponse = new HttpResponse();
                 httpResponse.printResponse(url);
+                //skapar en instans som skickar urln till metoden printResponse();
                 }
 
             PrintWriter output = new PrintWriter(socket.getOutputStream());
