@@ -38,6 +38,7 @@ public class HttpResponse {
                 return;
             }
 
+            //bodyn = byte arrayen som vi läst av filen som vi  angett urln till
             this.body = IOhandler.readFromFile(file);
 
             String type = Files.probeContentType(file.toPath());
@@ -61,7 +62,7 @@ public class HttpResponse {
 
         StringBuilder sb = new StringBuilder();
         sb.append("HTTP/1.1 200 OK\r\n");
-        sb.append("Content-Length:" + this.body + "\r\n");
+        sb.append("Content-Length:" + this.body.length + "\r\n");
         sb.append("Content-Type:" + type+ "\r\n");
         sb.append("\r\n");
 
@@ -71,16 +72,14 @@ public class HttpResponse {
 
 
     private String printPageNotFound() {
-        byte[] page = IOhandler.readFromFile(new File(".." + File.separator + "web" + File.separator + "404.html"));
+       this.body = IOhandler.readFromFile(new File(".." + File.separator + "web" + File.separator + "404.html"));
         //byte[] page = IOhandler.readFromFile(new File("core" + File.separator + "web" + File.separator + "404.html"));
         StringBuilder sb = new StringBuilder();
 
         sb.append("HTTP/1.1 404 Not Found\r\n");
-        sb.append("Content-Length:" + page.length + "\r\n");
+        sb.append("Content-Length:" + this.body.length + "\r\n");
         sb.append("Content-Type: text/html\r\n");
         sb.append("\r\n");
-
-        this.body = page;
 
         return sb.toString();
 

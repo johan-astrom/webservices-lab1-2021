@@ -16,27 +16,31 @@ import java.util.concurrent.*;
 public class Server {
 
     private static Map<String, UrlHandler> route;
+//Deklarerat en map som vi ska kunna nå senare i koden. Sparas i par.
 
     public static void main(String[] args) {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
-
+//Trådar skapas
 
         try {
             ServerSocket serverSocket = new ServerSocket(7050);
+//Servern startar
 
             route = new HashMap<>();
+//initieras hash map
 
             var loader = PluginLoader.findUrlHandlers();
+//anropas plugins och sparar i en service loader
 
             for (var handler : loader){
                 route.put(handler.getRoute(), handler);
+                //Går igenom service loader
             }
 
             while (true) {
 
                 Socket socket = serverSocket.accept();
-
                 executorService.execute(() -> handleConnection(socket));
 
             }
@@ -84,11 +88,10 @@ public class Server {
 
 
 
-           // route.put("/title", new TitleHandler(socket));
-            //route.put("/books", new BooksHandler(socket));
-
             String url = header[1];
 
+            //hämtar en url handler från vår Map
+            //Här bestäms vilken klass som vi hämtar (bookhandler eller titlehandler)
             UrlHandler urlHandler = route.get(url);
             HttpResponse httpResponse;
             if (urlHandler != null) {

@@ -43,12 +43,4 @@ public class BooksHandler implements UrlHandler {
     }
 
 
-
-    private void jsonSide(String json ) {
-        // skapa html med json mellen body tag
-        System.out.println(json);
-        String url="/json.html";
-        IOhandler.FileWriter(url, json);
-        //HttpResponse.printResponse(socket, url, false);
-    }
 }
