@@ -3,8 +3,6 @@ package se.iths;
 import se.iths.io.HttpResponse;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
-import se.iths.plugin.BooksHandler;
-import se.iths.plugin.TitleHandler;
 import se.iths.spi.UrlHandler;
 
 import java.io.*;
@@ -12,10 +10,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.*;
 
 public class Server {
 
+    private static Map<String, UrlHandler> route;
 
     public static void main(String[] args) {
 
@@ -24,6 +24,14 @@ public class Server {
 
         try {
             ServerSocket serverSocket = new ServerSocket(7050);
+
+            route = new HashMap<>();
+
+            var loader = PluginLoader.findUrlHandlers();
+
+            for (var handler : loader){
+                route.put(handler.getRoute(), handler);
+            }
 
             while (true) {
 
@@ -74,18 +82,33 @@ public class Server {
             }
 
 
-            Map<String, UrlHandler> route = new HashMap<>();
 
-            route.put("/title", new TitleHandler(socket));
-            route.put("/books", new BooksHandler(socket));
+
+           // route.put("/title", new TitleHandler(socket));
+            //route.put("/books", new BooksHandler(socket));
 
             String url = header[1];
+
             UrlHandler urlHandler = route.get(url);
+            HttpResponse httpResponse;
             if (urlHandler != null) {
-                urlHandler.handlerUrl();
+                httpResponse = urlHandler.handlerUrl();
             } else {
-                HttpResponse.printResponse(socket, url, isHead);
+                //HttpResponse.printResponse(socket, url, isHead);
+                httpResponse = new HttpResponse();
+                httpResponse.printResponse(url);
+                }
+
+            PrintWriter output = new PrintWriter(socket.getOutputStream());
+            output.print(httpResponse.getHeader());
+            output.flush();
+
+            if (!isHead) {
+                var dataOutput = new BufferedOutputStream(socket.getOutputStream());
+                dataOutput.write(httpResponse.getBody());
+                dataOutput.flush();
             }
+
 
             System.out.println(header[0]);
 

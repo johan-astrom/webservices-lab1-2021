@@ -23,25 +23,32 @@ public class BooksHandler implements UrlHandler {
     }
 
     @Override
+    public String getRoute() {
+        return "/books";
+    }
 
-    public void handlerUrl() {
+    @Override
 
+    public HttpResponse handlerUrl() {
+
+        HttpResponse httpResponse = new HttpResponse();
 
         BookDAO bdao = new BookDAOWithJPAImpl();
 
         List<Book> allBooks = bdao.getAllBooks();
 
-        jsonSide(ConvertJson.convertToJson(allBooks));
+        httpResponse.printJsonResponse(ConvertJson.convertToJson(allBooks));
 
-
+        return httpResponse;
     }
 
 
 
     private void jsonSide(String json ) {
         // skapa html med json mellen body tag
+        System.out.println(json);
         String url="/json.html";
         IOhandler.FileWriter(url, json);
-        HttpResponse.printResponse(socket, url, false);
+        //HttpResponse.printResponse(socket, url, false);
     }
 }

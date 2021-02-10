@@ -5,7 +5,6 @@ module se.iths.core {
     requires com.google.gson;
     requires java.persistence;
     requires se.iths.spi;
-    requires plugin;
     uses se.iths.spi.UrlHandler;
 
 }

@@ -23,12 +23,14 @@ public class TitleHandler implements UrlHandler {
         this.socket = socket;
     }
 
+
+
     @Override
-    public void handlerUrl() {
+    public HttpResponse handlerUrl() {
         BookDAO bdao = new BookDAOWithJPAImpl();
         List<Book> books = bdao.getAllBooks();
 
-        String url="/Title.txt";
+        String url="/title";
 
         String result="";
 
@@ -40,7 +42,13 @@ public class TitleHandler implements UrlHandler {
         IOhandler.FileWriter(url, result);
 
 
-        HttpResponse.printResponse(socket, url, false);
+        //HttpResponse.printResponse(socket, url, false);
+        return new HttpResponse();
+    }
+
+    @Override
+    public String getRoute() {
+        return "/title";
     }
 
 }
