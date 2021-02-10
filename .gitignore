@@ -173,4 +173,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#JPA Persistence
+persistence.xml
+
 # End of https://www.toptal.com/developers/gitignore/api/maven,intellij,macos,windows

@@ -18,6 +18,7 @@ public class HttpResponse {
                 url = "/index.html";
             }
 
+            //File file = new File(".." + File.separator + "web" + url);
             File file = new File("core" + File.separator + "web" + url);
             PrintWriter output = new PrintWriter(socket.getOutputStream());
 
@@ -59,6 +60,7 @@ public class HttpResponse {
     }
 
     private static void printPageNotFound(PrintWriter output) {
+        //byte[] page = IOhandler.readFromFile(new File(".." + File.separator + "web" + File.separator + "404.html"));
         byte[] page = IOhandler.readFromFile(new File("core" + File.separator + "web" + File.separator + "404.html"));
         output.println("HTTP/1.1 404 Not Found");
         output.println("Content-Length:" + page.length);
