@@ -1,7 +1,9 @@
 package se.iths.spi;
 
-public interface StatisticsHandler {
+public interface StatisticsHandler extends UrlHandler{
 
-   int countClients();
+
+   int countStats();
+
 
 }

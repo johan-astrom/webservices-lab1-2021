@@ -20,6 +20,7 @@ public class Server {
     // som vi ska kunna nå senare i koden. Sparas i par key och value från UrlHandler, sparas som routes.
     private static Map<String, UrlHandler> route;
 
+
     public static void main(String[] args) {
 
         //Trådar skapas
@@ -72,7 +73,10 @@ public class Server {
             String[] header = headerLine.split(" ");
 
             boolean isHead = true;
+            String url = header[1];
+            readHeaderLines(input, true, url);
             HttpResponse httpResponse = null;
+
 
 
             switch (header[0]) {
@@ -82,19 +86,19 @@ public class Server {
                     System.out.println("Hämta GET klass");
 
 
-                    httpResponse = findRoute(header[1]);
+                    httpResponse = findRoute(url);
                     break;
 
                 case "HEAD":
                     isHead = true;
                     System.out.println("Hämta HEAD metod");
-                    httpResponse = findRoute(header[1]);
+                    httpResponse = findRoute(url);
                     break;
 
                 case "POST":
                     System.out.println("Hämta POST metod");
-                    postRequest(input);
-                    httpResponse = findRoute("/cat.jpg");
+                    postRequest(input, url);
+                    httpResponse = findRoute(url);
                     break;
 
             }
@@ -143,8 +147,8 @@ public class Server {
         return httpResponse;
     }
 
-    private static void postRequest(BufferedReader input) throws IOException {
-        readHeaderLines(input);
+    private static void postRequest(BufferedReader input, String url) throws IOException {
+        readHeaderLines(input, false, url);
 
         String bodyLine = input.readLine();
 
@@ -164,25 +168,16 @@ public class Server {
         book.create(isbn13, title, genre, price);
     }
 
-    private static void readHeaderLines(BufferedReader input) throws IOException {
+    private static void readHeaderLines(BufferedReader input, boolean isUniqueUser, String url) throws IOException {
         String headerLine;
 
         while (true) {
             headerLine = input.readLine();
             System.out.println(headerLine);
 
-            if (headerLine.startsWith("User-Agent")) {
+            if (headerLine.startsWith("User-Agent") && isUniqueUser) {
 
-                // egen klass
-                var loaderStatistics = PluginLoader.findStatisticsHandler();
-
-                for (var handler : loaderStatistics) {
-                    if (handler.getClass().getSimpleName().equals("ViewersHandler")) {
-                        handler.countClients();
-                    }
-                    StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
-                    statisticsDAOWithJPA.create(headerLine);
-                }
+                writeUserToDB(headerLine, url);
 
 
             }
@@ -193,5 +188,20 @@ public class Server {
         }
 
 
+    }
+
+    private static void writeUserToDB(String headerLine, String url) {
+        // egen klass
+        var loaderStatistics = PluginLoader.findStatisticsHandler();
+
+        for (var handler : loaderStatistics) {
+            if (handler.getClass().getSimpleName().equals("ViewersHandler")) {
+
+
+                StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
+                statisticsDAOWithJPA.create(headerLine, url);
+            }
+
+        }
     }
 }

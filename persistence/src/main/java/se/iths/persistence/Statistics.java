@@ -6,30 +6,42 @@ import javax.persistence.*;
 @Table(name="[Statistics]")
 public class Statistics {
 
-    public Statistics( String userAgent) {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String userAgent;
+    private String url;
+
+    public Statistics( String userAgent, String url) {
+
         this.userAgent = userAgent;
+        this.url = url;
     }
 
     public Statistics() {
 
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String userAgent;
-    public static int count=0;
 
+    public String getUserAgent() {
+        return userAgent;
+    }
 
 
     public void setId(int id) {
+
         this.id = id;
     }
 
 
     public int getId() {
+
         return id;
     }
+
+
 
     @Override
     public String toString() {

@@ -8,7 +8,7 @@ public class main {
 
         StatisticsDAO sdao = new StatisticsDAOWithJPAImpl();
 
-        sdao.create("Test");
+        sdao.create("Test", "/stats");
         System.out.print( sdao.getAllStatistics());
 
 
