@@ -4,10 +4,10 @@ import java.util.List;
 
 public class ConvertJson {
 
-    static String convertToJson(List allBooks) {
+    static String convertToJson(List content) {
 
         Gson gson = new Gson();
-        String json = gson.toJson(allBooks);
+        String json = gson.toJson(content);
 
         return json;
 

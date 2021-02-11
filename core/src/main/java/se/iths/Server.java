@@ -12,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.*;
 
 public class Server {
@@ -74,7 +75,6 @@ public class Server {
 
             boolean isHead = true;
             String url = header[1];
-            readHeaderLines(input, true, url);
             HttpResponse httpResponse = null;
 
 
@@ -84,14 +84,14 @@ public class Server {
                 case "GET":
                     isHead = false;
                     System.out.println("Hämta GET klass");
-
-
+                    readHeaderLines(input, true, url);
                     httpResponse = findRoute(url);
                     break;
 
                 case "HEAD":
                     isHead = true;
                     System.out.println("Hämta HEAD metod");
+                    readHeaderLines(input, true, url);
                     httpResponse = findRoute(url);
                     break;
 
@@ -192,11 +192,8 @@ public class Server {
 
     private static void writeUserToDB(String headerLine, String url) {
         // egen klass
-        var loaderStatistics = PluginLoader.findStatisticsHandler();
-
-        for (var handler : loaderStatistics) {
+        for (var handler : route.values()) {
             if (handler.getClass().getSimpleName().equals("ViewersHandler")) {
-
 
                 StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
                 statisticsDAOWithJPA.create(headerLine, url);
@@ -204,4 +201,21 @@ public class Server {
 
         }
     }
+/*
+    private static void writeUserToDB(String headerLine, String url) {
+        // egen klass
+
+        ServiceLoader<>
+        for (var handler : route.values()) {
+            if (handler.getClass().getAnnotation(StatisticType.class).value().equals("/Viewers"));
+            {
+
+                StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
+                statisticsDAOWithJPA.create(headerLine, url);
+            }
+
+        }
+    }
+    
+ */
 }

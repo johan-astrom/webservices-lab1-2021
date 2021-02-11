@@ -9,6 +9,5 @@ module plugin {
     requires se.iths.persistence;
     requires se.iths.io;
     requires com.google.gson;
-    provides se.iths.spi.StatisticsHandler with ViewersHandler;
-    provides se.iths.spi.UrlHandler with BooksHandler, TitleHandler;
+    provides se.iths.spi.UrlHandler with BooksHandler, TitleHandler, ViewersHandler;
 }

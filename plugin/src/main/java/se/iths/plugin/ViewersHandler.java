@@ -7,7 +7,9 @@ import se.iths.spi.StatisticsHandler;
 
 import java.util.List;
 
+@StatisticType(type = "/Viewers")
 public class ViewersHandler implements StatisticsHandler {
+
 
 
     @Override
@@ -22,6 +24,7 @@ public class ViewersHandler implements StatisticsHandler {
         StatisticsDAO sdao = new StatisticsDAOWithJPAImpl();
 
         List<Statistics> statistics = sdao.getAllStatistics();
+        System.out.println(statistics);
 
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.printJsonResponse(ConvertJson.convertToJson(statistics));
