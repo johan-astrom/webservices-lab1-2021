@@ -12,6 +12,8 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <class>se.iths.persistence.Book</class>
+        <class>se.iths.persistence.Statistics</class>
+
 
         <properties>
 

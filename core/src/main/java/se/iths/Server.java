@@ -3,6 +3,8 @@ package se.iths;
 import se.iths.io.HttpResponse;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
+import se.iths.persistence.StatisticsDAOWithJPAImpl;
+import se.iths.spi.StatisticsHandler;
 import se.iths.spi.UrlHandler;
 
 import java.io.*;
@@ -51,12 +53,14 @@ public class Server {
         var loader = PluginLoader.findUrlHandlers();
 
         //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
-        for (var handler : loader){
+        for (var handler : loader) {
             route.put(handler.getRoute(), handler);
 
             // Utrskift på vår Map både key och vart den går
             //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
         }
+
+
     }
 
     private static void handleConnection(Socket socket) {
@@ -69,6 +73,7 @@ public class Server {
 
             boolean isHead = true;
             HttpResponse httpResponse = null;
+
 
             switch (header[0]) {
 
@@ -134,20 +139,12 @@ public class Server {
             httpResponse = new HttpResponse();
             httpResponse.printResponse(url);
             //skapar en instans som skickar urln till metoden printResponse();
-            }
+        }
         return httpResponse;
     }
 
     private static void postRequest(BufferedReader input) throws IOException {
-        String headerLine;
-        while (true) {
-            headerLine = input.readLine();
-            System.out.println(headerLine);
-
-            if (headerLine.isEmpty()) {
-                break;
-            }
-        }
+        readHeaderLines(input);
 
         String bodyLine = input.readLine();
 
@@ -167,5 +164,30 @@ public class Server {
         book.create(isbn13, title, genre, price);
     }
 
+    private static void readHeaderLines(BufferedReader input) throws IOException {
+        String headerLine;
 
+        while (true) {
+            headerLine = input.readLine();
+            System.out.println(headerLine);
+            if (headerLine.startsWith("User-Agent")) {
+                var loaderStatistics = PluginLoader.findStatisticsHandler();
+
+                for (var handler : loaderStatistics) {
+                    if (handler.getClass().getSimpleName().equals("ViewersHandler")) {
+                        handler.countClients();
+                    }
+                    StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
+                    statisticsDAOWithJPA.create(headerLine);
+                }
+
+                if (headerLine.isEmpty()) {
+                    break;
+                }
+            }
+
+        }
+
+
+    }
 }

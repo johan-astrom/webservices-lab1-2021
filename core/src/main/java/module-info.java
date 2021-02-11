@@ -6,5 +6,6 @@ module se.iths.core {
     requires java.persistence;
     requires se.iths.spi;
     uses se.iths.spi.UrlHandler;
+    uses se.iths.spi.StatisticsHandler;
 
 }

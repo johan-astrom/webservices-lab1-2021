@@ -1,6 +1,7 @@
 package se.iths.plugin;
 
 import se.iths.io.HttpResponse;
+import se.iths.persistence.Statistics;
 import se.iths.spi.StatisticsHandler;
 
 public class ViewersHandler implements StatisticsHandler {
@@ -8,18 +9,8 @@ public class ViewersHandler implements StatisticsHandler {
 
     @Override
     public int countClients() {
-        return 0;
+        return Statistics.count;
     }
 
-    @Override
-    public HttpResponse handlerUrl() {
 
-
-        return null;
-    }
-
-    @Override
-    public String getRoute() {
-        return "/viewers";
-    }
 }

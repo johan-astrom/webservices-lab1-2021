@@ -6,6 +6,13 @@ public class main {
 
     public static void main(String[] args) {
 
+        StatisticsDAO sdao = new StatisticsDAOWithJPAImpl();
+
+        sdao.create("Test");
+        System.out.print( sdao.getAllStatistics());
+
+
+
         BookDAO bdao = new BookDAOWithJPAImpl();
 
         List<Book> books = bdao.getAllBooks();
@@ -13,7 +20,7 @@ public class main {
 
        // bdao.create(1234567890123L, "På spåret", "Novel", 159.90);
 
-        long isbn = 1234567890124L;
+     /*   long isbn = 1234567890124L;
         String title = "Babblarna";
         String genre = "Kidsbooks";
         double price = 99.00;
@@ -25,7 +32,7 @@ public class main {
         for (Book book: books) {
             System.out.println(book.getTitle());
         }
-
+*/
     }
 
 
