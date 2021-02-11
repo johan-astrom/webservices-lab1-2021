@@ -170,7 +170,10 @@ public class Server {
         while (true) {
             headerLine = input.readLine();
             System.out.println(headerLine);
+
             if (headerLine.startsWith("User-Agent")) {
+
+                // egen klass
                 var loaderStatistics = PluginLoader.findStatisticsHandler();
 
                 for (var handler : loaderStatistics) {
@@ -181,11 +184,12 @@ public class Server {
                     statisticsDAOWithJPA.create(headerLine);
                 }
 
-                if (headerLine.isEmpty()) {
-                    break;
-                }
+
             }
 
+            if (headerLine.isEmpty()) {
+                break;
+            }
         }
 
 

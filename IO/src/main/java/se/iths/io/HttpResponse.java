@@ -69,8 +69,9 @@ public class HttpResponse {
 
     //Metod för utskrift json
     public void printJsonResponse(String json){
+       setBody(json.getBytes(StandardCharsets.UTF_8));
        setHeader(printHeaderLines("application/json"));
-        setBody(json.getBytes(StandardCharsets.UTF_8));
+
 
     }
 
