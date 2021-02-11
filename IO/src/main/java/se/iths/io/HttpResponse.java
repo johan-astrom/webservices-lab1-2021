@@ -1,10 +1,7 @@
 package se.iths.io;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -12,6 +9,16 @@ public class HttpResponse {
 
     private String header;
     private byte[] body;
+
+    private void setHeader(String header) {
+        this.header = header;
+    }
+
+    private void setBody(byte[] body) {
+        this.body = body;
+    }
+
+
 
     public String getHeader() {
         return header;
@@ -26,29 +33,22 @@ public class HttpResponse {
         try {
             System.out.println("Url =" + url);
 
-            //Urln sätts till /index.html om den är /
-            if (url.equals("/")) {
-                url = "/index.html";
-            }
-
-            //Skapar objektet file
-            File file = new File(".." + File.separator + "web" + url);
-            //File file = new File("core" + File.separator + "web" + url);
+            File file = createFile(url);
 
             //Finns inte filen anropas 404
             if (!file.exists()) {
-                this.header = printPageNotFound();
+                setHeader(printPageNotFound());
                 return;
             }
 
             //existerar filen läses bodyn in
             //bodyn = bytearrayen som vi läst av filen som vi  angett urln till
-            this.body = IOhandler.readFromFile(file);
+            setBody(IOhandler.readFromFile(file));
 
             //probecontenttype hittar vilken typ av fil och returnerar den
             String type = Files.probeContentType(file.toPath());
             //sätter headern till den typen
-            this.header = printHeaderLines(type);
+            setHeader( printHeaderLines(type));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,10 +56,21 @@ public class HttpResponse {
 
     }
 
+    private File createFile(String url) {
+        //Urln sätts till /index.html om den är /
+        if (url.equals("/")) {
+            url = "/index.html";
+        }
+
+        //Skapar objektet file
+        //File file = new File("core" + File.separator + "web" + url);
+        return new File(".." + File.separator + "web" + url);
+    }
+
     //Metod för utskrift json
     public void printJsonResponse(String json){
-        this.header = printHeaderLines("application/json");
-        this.body=json.getBytes(StandardCharsets.UTF_8);
+       setHeader(printHeaderLines("application/json"));
+        setBody(json.getBytes(StandardCharsets.UTF_8));
 
     }
 
@@ -77,8 +88,7 @@ public class HttpResponse {
 
 
     private String printPageNotFound() {
-       this.body = IOhandler.readFromFile(new File(".." + File.separator + "web" + File.separator + "404.html"));
-        //byte[] page = IOhandler.readFromFile(new File("core" + File.separator + "web" + File.separator + "404.html"));
+       setBody(IOhandler.readFromFile(new File(".." + File.separator + "web" + File.separator + "404.html")));
         StringBuilder sb = new StringBuilder();
 
         sb.append("HTTP/1.1 404 Not Found\r\n");

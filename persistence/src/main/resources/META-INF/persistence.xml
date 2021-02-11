@@ -15,7 +15,7 @@
 
         <properties>
 
-            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost;database=BookStore"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost;database=BokStore"/>
             <property name="javax.persistence.jdbc.user" value="Andenk"/>
             <property name="javax.persistence.jdbc.password" value="Andenk"/>
             <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>

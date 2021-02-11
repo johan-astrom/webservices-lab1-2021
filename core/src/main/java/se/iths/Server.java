@@ -10,7 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.*;
 
 public class Server {
@@ -28,23 +27,9 @@ public class Server {
             //Servern startar
             ServerSocket serverSocket = new ServerSocket(7050);
 
-            //Initieras en hash map för våra routes
-            route = new HashMap<>();
-
-            //Klassen PluginLoader anropar findUrlHandlers som söker plugins, sparas i
-            //en serviceloader
-            var loader = PluginLoader.findUrlHandlers();
-
-            //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
-            for (var handler : loader){
-                route.put(handler.getRoute(), handler);
-
-                // Utrskift på vår Map både key och vart den går
-                //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
-            }
+            createMap();
 
             while (true) {
-
                 //Klienten ansluter till servern, skickar socket till handleConnection();
                 Socket socket = serverSocket.accept();
                 executorService.execute(() -> handleConnection(socket));
@@ -57,6 +42,23 @@ public class Server {
 
     }
 
+    private static void createMap() {
+        //Initieras en hash map för våra routes
+        route = new HashMap<>();
+
+        //Klassen PluginLoader anropar findUrlHandlers som söker plugins, sparas i
+        //en serviceloader
+        var loader = PluginLoader.findUrlHandlers();
+
+        //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
+        for (var handler : loader){
+            route.put(handler.getRoute(), handler);
+
+            // Utrskift på vår Map både key och vart den går
+            //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
+        }
+    }
+
     private static void handleConnection(Socket socket) {
 
         try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
@@ -66,53 +68,34 @@ public class Server {
             String[] header = headerLine.split(" ");
 
             boolean isHead = true;
+            HttpResponse httpResponse = null;
 
             switch (header[0]) {
 
                 case "GET":
                     isHead = false;
                     System.out.println("Hämta GET klass");
+
+
+                    httpResponse = findRoute(header[1]);
                     break;
 
                 case "HEAD":
                     isHead = true;
                     System.out.println("Hämta HEAD metod");
+                    httpResponse = findRoute(header[1]);
                     break;
 
                 case "POST":
                     System.out.println("Hämta POST metod");
                     postRequest(input);
+                    httpResponse = findRoute("/cat.jpg");
                     break;
 
-                default:
-                    System.out.println("404");
             }
 
 
-            //hämtar en url handler från vår Map
-            //Här bestäms vilken klass som vi hämtar (bookhandler eller titlehandler)
-            String url = header[1];
-
-          UrlHandler urlHandler = route.get(url);
-            HttpResponse httpResponse;
-            if (urlHandler != null) {
-                httpResponse = urlHandler.handlerUrl();
-            } else {
-                //HttpResponse.printResponse(socket, url, isHead);
-                httpResponse = new HttpResponse();
-                httpResponse.printResponse(url);
-                //skapar en instans som skickar urln till metoden printResponse();
-                }
-
-            PrintWriter output = new PrintWriter(socket.getOutputStream());
-            output.print(httpResponse.getHeader());
-            output.flush();
-
-            if (!isHead) {
-                var dataOutput = new BufferedOutputStream(socket.getOutputStream());
-                dataOutput.write(httpResponse.getBody());
-                dataOutput.flush();
-            }
+            sendHttp(socket, isHead, httpResponse);
 
 
             System.out.println(header[0]);
@@ -126,10 +109,40 @@ public class Server {
 
     }
 
+    private static void sendHttp(Socket socket, boolean isHead, HttpResponse httpResponse) throws IOException {
+        PrintWriter output = new PrintWriter(socket.getOutputStream());
+        output.print(httpResponse.getHeader());
+        output.flush();
+
+        if (!isHead) {
+            var dataOutput = new BufferedOutputStream(socket.getOutputStream());
+            dataOutput.write(httpResponse.getBody());
+            dataOutput.flush();
+        }
+    }
+
+    private static HttpResponse findRoute(String url) {
+        //hämtar en url handler från vår Map
+        //Här bestäms vilken klass som vi hämtar (bookhandler eller titlehandler)
+
+        UrlHandler urlHandler = route.get(url);
+        HttpResponse httpResponse;
+        if (urlHandler != null) {
+            httpResponse = urlHandler.handlerUrl();
+        } else {
+            //HttpResponse.printResponse(socket, url, isHead);
+            httpResponse = new HttpResponse();
+            httpResponse.printResponse(url);
+            //skapar en instans som skickar urln till metoden printResponse();
+            }
+        return httpResponse;
+    }
+
     private static void postRequest(BufferedReader input) throws IOException {
         String headerLine;
         while (true) {
             headerLine = input.readLine();
+            System.out.println(headerLine);
 
             if (headerLine.isEmpty()) {
                 break;
