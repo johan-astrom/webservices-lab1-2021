@@ -38,6 +38,9 @@ public class Server {
             //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
             for (var handler : loader){
                 route.put(handler.getRoute(), handler);
+
+                // Utrskift på vår Map både key och vart den går
+                //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
             }
 
             while (true) {

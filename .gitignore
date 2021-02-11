@@ -174,6 +174,7 @@ $RECYCLE.BIN/
 *.lnk
 
 #JPA Persistence
+presitstence/src/main/resourses/
 persistence.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/maven,intellij,macos,windows
