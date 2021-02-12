@@ -125,25 +125,28 @@ public class Server {
     }
 
     private static HttpResponse findRoute(String url) {
-        //hämtar en url handler från vår Map
-        //Här bestäms vilken klass som vi hämtar (bookhandler eller titlehandler)
+        //Gör en ny URL-handler-klass som hanterar filer, anropas ifall urlHandler = null (den ligger m.a.o. inte i map:en route.
 
         UrlHandler urlHandler = route.get(url);
         HttpResponse httpResponse;
-        if (urlHandler != null) {
-            httpResponse = urlHandler.handlerUrl();
-        } else {
-            //HttpResponse.printResponse(socket, url, isHead);
+        if (urlHandler==null){
+            //Ersätt med ny klass i detta package som implementerar URLHandler, anropa dess handlerUrl-metod.
+            //urlHandler = new VåranNyaKlassSomImplementerarURLHandler
             httpResponse = new HttpResponse();
             httpResponse.printResponse(url);
-            //skapar en instans som skickar urln till metoden printResponse();
-        }
+        } httpResponse = urlHandler.handlerUrl();
+
+
         return httpResponse;
+
     }
 
+
     private static void postRequest(BufferedReader input, String url) throws IOException {
+        //Plocka ut content-length/-type
         readHeaderLines(input, true, url);
 
+        //Kräver radbrytning för att funka. Använd BufferedInputStream(socket.getInputStream) + flush()
         String bodyLine = input.readLine();
 
         String[] body = bodyLine.split("&");
@@ -163,6 +166,8 @@ public class Server {
     }
 
     private static void readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
+        //Plocka ut content-length/-type
+
         String headerLine;
 
         while (true) {

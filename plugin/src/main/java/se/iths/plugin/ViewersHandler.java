@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@StatisticType(type = "/Viewers")
+//Byt ut fältet mot annotation.
+@StatisticType(route = "/stats")
 public class ViewersHandler implements StatisticsHandler {
 
     private String route = "/stats";
