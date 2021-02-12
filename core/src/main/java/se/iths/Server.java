@@ -61,6 +61,7 @@ public class Server {
 
         //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
         for (var handler : loader) {
+            // TODO: 2021-02-12 Ändra .getRoute() till metod som söker efter värdet hos annotation, ange annotations för alla UrlHandler-klasser
             route.put(handler.getRoute(), handler);
 
             // Utrskift på vår Map både key och vart den går
@@ -143,6 +144,7 @@ public class Server {
         HttpResponse httpResponse;
         HttpRequest httpRequest = new HttpRequest(url);
 
+        // TODO: 2021-02-12 Klassen FileHandler ska ligga i detta paket för att kunna nås.
         if (urlHandler==null){
           /*  try {
 
@@ -161,12 +163,11 @@ public class Server {
 
     }
 
-
+    // TODO: 2021-02-12 Ändra från BufferedReader till BufferedInputStream(socket.getInputStream) + flush()
     private static void postRequest(BufferedReader input, String url) throws IOException {
         //Plocka ut content-length/-type
         readHeaderLines(input, true, url);
 
-        //Kräver radbrytning för att funka. Använd BufferedInputStream(socket.getInputStream) + flush()
         String bodyLine = input.readLine();
 
         String[] body = bodyLine.split("&");
@@ -179,12 +180,13 @@ public class Server {
         double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
 
         //System.out.println(isbn13 + " " + title + " " + genre + " " + price);
-
+        // TODO: 2021-02-12 Lägg i egen klass.
         BookDAO book = new BookDAOWithJPAImpl();
 
         book.create(isbn13, title, genre, price);
     }
 
+    // TODO: 2021-02-12 Spara varje rad i en StringBuilder, låt metoden returnera hela. Anropa ev. writeUserToDB från annan metod.
     private static void readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
         //Plocka ut content-length/-type
 
@@ -210,7 +212,7 @@ public class Server {
     }
 
     private static void writeUserToDB(String headerLine, String url) {
-        // egen klass
+        // TODO: 2021-02-12 Lägg i egen klass.
                 StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
                 statisticsDAOWithJPA.create(headerLine, url);
             }
