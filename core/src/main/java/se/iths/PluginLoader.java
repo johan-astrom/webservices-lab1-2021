@@ -12,9 +12,8 @@ public class PluginLoader {
 
         //ServiceLoader går in i klassen UrlHandler och söker efter
         // alla våra plugins och laddar in alla plugins. Returnerar dem
-        ServiceLoader<UrlHandler> loader = ServiceLoader.load(UrlHandler.class);
 
-        return loader;
+        return ServiceLoader.load(UrlHandler.class);
 
     }
 

@@ -1,16 +1,18 @@
 package se.iths.plugin;
 
 import se.iths.io.HttpResponse;
-import se.iths.io.IOhandler;
 import se.iths.persistence.*;
+import se.iths.spi.StatisticType;
 import se.iths.spi.StatisticsHandler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @StatisticType(type = "/Viewers")
 public class ViewersHandler implements StatisticsHandler {
 
-
+    private String route = "/stats";
 
     @Override
     public int countStats() {
@@ -26,14 +28,23 @@ public class ViewersHandler implements StatisticsHandler {
         List<Statistics> statistics = sdao.getAllStatistics();
         System.out.println(statistics);
 
+        int countC = 0;
+        for (Statistics stat : statistics) {
+            if (stat.getUrl().equals("/cat.jpg")){
+                countC++;
+            }
+        }
+
         HttpResponse httpResponse = new HttpResponse();
-        httpResponse.printJsonResponse(ConvertJson.convertToJson(statistics));
+        httpResponse.printJsonResponse(ConvertJson.convertToJson(statistics) +
+                "\r\nTotal number of page views = " + statistics.size() +
+                "\r\nCat viewed: " + countC + " times.");
 
         return httpResponse;
     }
 
     @Override
     public String getRoute() {
-        return "/stats";
+        return route;
     }
 }

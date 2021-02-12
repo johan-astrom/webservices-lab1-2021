@@ -14,7 +14,11 @@ public class Statistics {
     private String userAgent;
     private String url;
 
-    public Statistics( String userAgent, String url) {
+    public String getUrl() {
+        return url;
+    }
+
+    public Statistics(String userAgent, String url) {
 
         this.userAgent = userAgent;
         this.url = url;

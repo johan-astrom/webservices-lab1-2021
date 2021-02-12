@@ -31,8 +31,6 @@ public class HttpResponse {
     public void printResponse(String url) {
 
         try {
-            System.out.println("Url =" + url);
-
             File file = createFile(url);
 
             //Finns inte filen anropas 404

@@ -25,7 +25,6 @@ public class StatisticsDAOWithJPAImpl implements StatisticsDAO{
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         Statistics statistics = new Statistics(userAgent, url);
-        System.out.println("statistics created");
         em.persist(statistics);
         em.getTransaction().commit();
 

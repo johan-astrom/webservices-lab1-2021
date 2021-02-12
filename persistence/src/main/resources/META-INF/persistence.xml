@@ -17,9 +17,9 @@
 
         <properties>
 
-            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost;database=bookstore"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://localhost;database=BookStore"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
-            <property name="javax.persistence.jdbc.password" value="myPassw0rd"/>
+            <property name="javax.persistence.jdbc.password" value="Snackskal123"/>
             <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
             <property name="hibernate.show_sql" value="true"/>
 

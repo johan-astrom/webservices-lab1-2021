@@ -13,18 +13,12 @@ import java.util.List;
 
 
 public class BooksHandler implements UrlHandler {
-    public BooksHandler() {
-    }
 
-    private Socket socket;
-
-    public BooksHandler(Socket socket) {
-        this.socket = socket;
-    }
+    private String route = "/books";
 
     @Override
     public String getRoute() {
-        return "/books";
+        return route;
     }
 
     @Override

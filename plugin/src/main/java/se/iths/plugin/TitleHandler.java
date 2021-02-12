@@ -12,6 +12,7 @@ import java.util.List;
 
 public class TitleHandler implements UrlHandler {
 
+    private String route = "/title";
 
     @Override
     public HttpResponse handlerUrl() {
@@ -39,7 +40,7 @@ public class TitleHandler implements UrlHandler {
 
     @Override
     public String getRoute() {
-        return "/title";
+        return route;
     }
 
 }

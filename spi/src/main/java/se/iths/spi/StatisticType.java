@@ -1,4 +1,4 @@
-package se.iths.plugin;
+package se.iths.spi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

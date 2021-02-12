@@ -4,6 +4,7 @@ import se.iths.io.HttpResponse;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
 import se.iths.persistence.StatisticsDAOWithJPAImpl;
+import se.iths.spi.StatisticType;
 import se.iths.spi.StatisticsHandler;
 import se.iths.spi.UrlHandler;
 
@@ -83,31 +84,24 @@ public class Server {
 
                 case "GET":
                     isHead = false;
-                    System.out.println("Hämta GET klass");
-                    readHeaderLines(input, true, url);
+                    readHeaderLines(input, false, url);
                     httpResponse = findRoute(url);
                     break;
 
                 case "HEAD":
                     isHead = true;
-                    System.out.println("Hämta HEAD metod");
-                    readHeaderLines(input, true, url);
+                    readHeaderLines(input, false, url);
                     httpResponse = findRoute(url);
                     break;
 
                 case "POST":
-                    System.out.println("Hämta POST metod");
                     postRequest(input, url);
                     httpResponse = findRoute(url);
                     break;
 
             }
 
-
             sendHttp(socket, isHead, httpResponse);
-
-
-            System.out.println(header[0]);
 
             socket.close();
 
@@ -148,34 +142,33 @@ public class Server {
     }
 
     private static void postRequest(BufferedReader input, String url) throws IOException {
-        readHeaderLines(input, false, url);
+        readHeaderLines(input, true, url);
 
         String bodyLine = input.readLine();
 
         String[] body = bodyLine.split("&");
 
-        System.out.println(bodyLine);
+        //System.out.println(bodyLine);
 
         long isbn13 = Long.parseLong(body[0].substring(body[0].indexOf("=") + 1));
         String title = body[1].substring(body[1].indexOf("=") + 1);
         String genre = body[2].substring(body[2].indexOf("=") + 1);
         double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
 
-        System.out.println(isbn13 + " " + title + " " + genre + " " + price);
+        //System.out.println(isbn13 + " " + title + " " + genre + " " + price);
 
         BookDAO book = new BookDAOWithJPAImpl();
 
         book.create(isbn13, title, genre, price);
     }
 
-    private static void readHeaderLines(BufferedReader input, boolean isUniqueUser, String url) throws IOException {
+    private static void readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
         String headerLine;
 
         while (true) {
             headerLine = input.readLine();
-            System.out.println(headerLine);
 
-            if (headerLine.startsWith("User-Agent") && isUniqueUser) {
+            if (headerLine.startsWith("User-Agent") && !isPost) {
 
                 writeUserToDB(headerLine, url);
 
@@ -192,22 +185,18 @@ public class Server {
 
     private static void writeUserToDB(String headerLine, String url) {
         // egen klass
-        for (var handler : route.values()) {
-            if (handler.getClass().getSimpleName().equals("ViewersHandler")) {
-
                 StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
                 statisticsDAOWithJPA.create(headerLine, url);
             }
 
         }
-    }
-/*
-    private static void writeUserToDB(String headerLine, String url) {
+
+
+  /*  private static void writeUserToDB(String headerLine, String url) {
         // egen klass
 
-        ServiceLoader<>
         for (var handler : route.values()) {
-            if (handler.getClass().getAnnotation(StatisticType.class).value().equals("/Viewers"));
+            if (handler.getClass().getAnnotation(StatisticType.class).type().equals("/Viewers"));
             {
 
                 StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
@@ -216,6 +205,5 @@ public class Server {
 
         }
     }
-    
- */
-}
+   */
+
