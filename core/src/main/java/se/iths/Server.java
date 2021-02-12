@@ -1,5 +1,6 @@
 package se.iths;
 
+import se.iths.io.HttpRequest;
 import se.iths.io.HttpResponse;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
@@ -9,12 +10,15 @@ import se.iths.spi.StatisticsHandler;
 import se.iths.spi.UrlHandler;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.*;
+import java.util.logging.FileHandler;
 
 public class Server {
 
@@ -72,6 +76,7 @@ public class Server {
 
             String headerLine = input.readLine();
 
+
             String[] header = headerLine.split(" ");
 
             boolean isHead = true;
@@ -79,6 +84,13 @@ public class Server {
             HttpResponse httpResponse = null;
 
 
+            //Kod för URL-parametrar
+            try {
+                URL parameter = new URL("http://localhost:7050" + url);
+                System.out.println(parameter.getQuery() + "--------------------------->");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
 
             switch (header[0]) {
 
@@ -129,12 +141,20 @@ public class Server {
 
         UrlHandler urlHandler = route.get(url);
         HttpResponse httpResponse;
+        HttpRequest httpRequest = new HttpRequest(url);
+
         if (urlHandler==null){
+          /*  try {
+
+                //Fungerar ej..
+              //  urlHandler = new FileHandler();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
             //Ersätt med ny klass i detta package som implementerar URLHandler, anropa dess handlerUrl-metod.
             //urlHandler = new VåranNyaKlassSomImplementerarURLHandler
-            httpResponse = new HttpResponse();
-            httpResponse.printResponse(url);
-        } httpResponse = urlHandler.handlerUrl();
+        } httpResponse = urlHandler.handlerUrl(httpRequest);
 
 
         return httpResponse;
@@ -172,6 +192,7 @@ public class Server {
 
         while (true) {
             headerLine = input.readLine();
+            System.out.println(headerLine);
 
             if (headerLine.startsWith("User-Agent") && !isPost) {
 

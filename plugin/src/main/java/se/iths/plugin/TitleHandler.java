@@ -1,6 +1,7 @@
 package se.iths.plugin;
 
 
+import se.iths.io.HttpRequest;
 import se.iths.io.HttpResponse;
 import se.iths.io.IOhandler;
 
@@ -15,7 +16,7 @@ public class TitleHandler implements UrlHandler {
     private String route = "/title";
 
     @Override
-    public HttpResponse handlerUrl() {
+    public HttpResponse handlerUrl(HttpRequest httpRequest) {
         BookDAO bdao = new BookDAOWithJPAImpl();
         List<Book> books = bdao.getAllBooks();
 

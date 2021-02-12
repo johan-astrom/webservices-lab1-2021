@@ -1,5 +1,6 @@
 package se.iths.plugin;
 
+import se.iths.io.HttpRequest;
 import se.iths.io.HttpResponse;
 import se.iths.persistence.*;
 import se.iths.spi.StatisticType;
@@ -22,36 +23,30 @@ public class ViewersHandler implements StatisticsHandler {
 
 
     @Override
-    public HttpResponse handlerUrl() {
+    public HttpResponse handlerUrl(HttpRequest httpRequest) {
 
         StatisticsDAO sdao = new StatisticsDAOWithJPAImpl();
 
         List<Statistics> statistics = sdao.getAllStatistics();
         System.out.println(statistics);
 
-        int countC = 0;
-        for (Statistics stat : statistics) {
-            if (stat.getUrl().equals("/cat.jpg")){
-                countC++;
-            }
-        }
-
-  /*      List<String> statsCount = new ArrayList<String>();
-        for (Statistics statis: statistics){
+        List<String> statsCount = new ArrayList<String>();
+        for (Statistics statis : statistics) {
             statsCount.add(statis.getUrl());
         }
         int cat = Collections.frequency(statsCount, "/cat.jpg");
         int index = Collections.frequency(statsCount, "/index.html");
         int books = Collections.frequency(statsCount, "/books");
         int stats = Collections.frequency(statsCount, "/stats");
-*/
-
 
 
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.printJsonResponse(ConvertJson.convertToJson(statistics) +
                 "\r\nTotal number of page views = " + statistics.size() +
-                "\r\nCat viewed: " + countC + " times.");
+                "\r\ncat viewed: " + cat + " times." +
+                "\r\nindex viewed: " + index + " times." +
+                "\r\nbooks viewed: " + books + " times." +
+                "\r\nstats viewed: " + stats + " times.");
 
         return httpResponse;
     }
