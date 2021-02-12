@@ -35,6 +35,18 @@ public class ViewersHandler implements StatisticsHandler {
             }
         }
 
+  /*      List<String> statsCount = new ArrayList<String>();
+        for (Statistics statis: statistics){
+            statsCount.add(statis.getUrl());
+        }
+        int cat = Collections.frequency(statsCount, "/cat.jpg");
+        int index = Collections.frequency(statsCount, "/index.html");
+        int books = Collections.frequency(statsCount, "/books");
+        int stats = Collections.frequency(statsCount, "/stats");
+*/
+
+
+
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.printJsonResponse(ConvertJson.convertToJson(statistics) +
                 "\r\nTotal number of page views = " + statistics.size() +
