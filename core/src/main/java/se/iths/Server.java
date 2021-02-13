@@ -144,8 +144,18 @@ public class Server {
         HttpResponse httpResponse;
         HttpRequest httpRequest = new HttpRequest(url);
 
-        // TODO: 2021-02-12 Klassen FileHandler ska ligga i detta paket för att kunna nås.
-        if (urlHandler==null){
+        // TODO: 2021-02-12 Klassen FileHandler ska ligga i detta paket för att kunna nås ----->// (testade ett annat alternativ som kanske kan vara något? se rad 152).
+
+
+        if(urlHandler == null) {
+
+            urlHandler = route.get("fileHandler");
+
+
+        }
+
+
+            if (urlHandler==null){
           /*  try {
 
                 //Fungerar ej..
@@ -156,7 +166,9 @@ public class Server {
             }*/
             //Ersätt med ny klass i detta package som implementerar URLHandler, anropa dess handlerUrl-metod.
             //urlHandler = new VåranNyaKlassSomImplementerarURLHandler
-        } httpResponse = urlHandler.handlerUrl(httpRequest);
+        }
+
+        httpResponse = urlHandler.handlerUrl(httpRequest);
 
 
         return httpResponse;

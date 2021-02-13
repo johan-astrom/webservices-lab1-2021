@@ -6,18 +6,19 @@ import se.iths.spi.UrlHandler;
 
 public class FileHandler implements UrlHandler {
 
-    public FileHandler() {
-    }
+    private String route = "fileHandler";
+
+
 
     @Override
     public HttpResponse handlerUrl(HttpRequest httpRequest) {
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.printResponse(httpRequest.getUrl());
-        return null;
+        return httpResponse;
     }
 
     @Override
     public String getRoute() {
-        return null;
+        return route;
     }
 }
