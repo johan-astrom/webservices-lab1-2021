@@ -5,8 +5,7 @@ import se.iths.io.HttpResponse;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
 import se.iths.persistence.StatisticsDAOWithJPAImpl;
-import se.iths.spi.StatisticType;
-import se.iths.spi.StatisticsHandler;
+import se.iths.spi.PluginType;
 import se.iths.spi.UrlHandler;
 
 import java.io.*;
@@ -14,11 +13,10 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.*;
-import java.util.logging.FileHandler;
 
 public class Server {
 
@@ -61,8 +59,8 @@ public class Server {
 
         //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
         for (var handler : loader) {
-            // TODO: 2021-02-12 Ändra .getRoute() till metod som söker efter värdet hos annotation, ange annotations för alla UrlHandler-klasser
-            route.put(handler.getRoute(), handler);
+           // route.put(handler.getRoute(), handler);
+            route.put(handler.getClass().getAnnotation(PluginType.class).route(), handler);
 
             // Utrskift på vår Map både key och vart den går
             //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
@@ -81,17 +79,15 @@ public class Server {
             String[] header = headerLine.split(" ");
 
             boolean isHead = true;
+
             String url = header[1];
+
+
             HttpResponse httpResponse = null;
 
 
             //Kod för URL-parametrar
-            try {
-                URL parameter = new URL("http://localhost:7050" + url);
-                System.out.println(parameter.getQuery() + "--------------------------->");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+
 
             switch (header[0]) {
 
@@ -108,7 +104,8 @@ public class Server {
                     break;
 
                 case "POST":
-                    postRequest(input, url);
+                    BufferedInputStream postInput = new BufferedInputStream(socket.getInputStream());
+                    postRequest(postInput, input, url);
                     httpResponse = findRoute(url);
                     break;
 
@@ -140,11 +137,20 @@ public class Server {
     private static HttpResponse findRoute(String url) {
         //Gör en ny URL-handler-klass som hanterar filer, anropas ifall urlHandler = null (den ligger m.a.o. inte i map:en route.
 
-        UrlHandler urlHandler = route.get(url);
+
+        String routeUrl= url;
+        if(url.indexOf("?")!=-1){
+
+            routeUrl = url.split("\\?")[0];
+
+        }
+
+
+
+
+        UrlHandler urlHandler = route.get(routeUrl);
         HttpResponse httpResponse;
         HttpRequest httpRequest = new HttpRequest(url);
-
-        // TODO: 2021-02-12 Klassen FileHandler ska ligga i detta paket för att kunna nås ----->// (testade ett annat alternativ som kanske kan vara något? se rad 152).
 
 
         if(urlHandler == null) {
@@ -176,11 +182,13 @@ public class Server {
     }
 
     // TODO: 2021-02-12 Ändra från BufferedReader till BufferedInputStream(socket.getInputStream) + flush()
-    private static void postRequest(BufferedReader input, String url) throws IOException {
+    private static void postRequest(BufferedInputStream postInput, BufferedReader input, String url) throws IOException {
         //Plocka ut content-length/-type
-        readHeaderLines(input, true, url);
+        int contentLength = readHeaderLines(input, true, url);
+
 
         String bodyLine = input.readLine();
+
 
         String[] body = bodyLine.split("&");
 
@@ -199,14 +207,23 @@ public class Server {
     }
 
     // TODO: 2021-02-12 Spara varje rad i en StringBuilder, låt metoden returnera hela. Anropa ev. writeUserToDB från annan metod.
-    private static void readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
+    private static int readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
         //Plocka ut content-length/-type
 
         String headerLine;
+        int contentLength = 0;
 
         while (true) {
             headerLine = input.readLine();
             System.out.println(headerLine);
+
+            if(headerLine.startsWith("Content-Length")){
+
+               contentLength = Integer.parseInt(headerLine.split(" ")[1]);
+
+            }
+
+
 
             if (headerLine.startsWith("User-Agent") && !isPost) {
 
@@ -220,6 +237,7 @@ public class Server {
             }
         }
 
+        return contentLength;
 
     }
 

@@ -7,12 +7,13 @@ import se.iths.io.IOhandler;
 import se.iths.persistence.Book;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
+import se.iths.spi.PluginType;
 import se.iths.spi.UrlHandler;
 
 import java.net.Socket;
 import java.util.List;
 
-
+@PluginType(route = "/books")
 public class BooksHandler implements UrlHandler {
 
     private String route = "/books";

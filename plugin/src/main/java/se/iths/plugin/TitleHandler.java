@@ -8,9 +8,11 @@ import se.iths.io.IOhandler;
 import se.iths.persistence.Book;
 import se.iths.persistence.BookDAO;
 import se.iths.persistence.BookDAOWithJPAImpl;
+import se.iths.spi.PluginType;
 import se.iths.spi.UrlHandler;
 import java.util.List;
 
+@PluginType(route = "/title")
 public class TitleHandler implements UrlHandler {
 
     private String route = "/title";
