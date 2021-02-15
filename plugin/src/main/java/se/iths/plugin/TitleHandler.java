@@ -37,7 +37,9 @@ public class TitleHandler implements UrlHandler {
 
         HttpResponse httpResponse = new HttpResponse();
 
-        httpResponse.printResponse("/title.txt");
+        httpResponse.printResponse("/title");
+        // Uppdaterat till detta dokument, det andra returnerade ej alla registreringar
+        // TODO: 2021-02-15 Ta bort dokument title.txt?
         return httpResponse;
     }
 
