@@ -40,7 +40,7 @@ public class ViewersHandler implements StatisticsHandler {
         for (Statistics statis : statistics) {
             statsCount.add(statis.getUrl());
         }
-        git int cat = Collections.frequency(statsCount, "/cat.jpg");
+        int cat = Collections.frequency(statsCount, "/cat.jpg");
         int index = Collections.frequency(statsCount, "/index.html");
         int books = Collections.frequency(statsCount, "/books");
         int stats = Collections.frequency(statsCount, "/stats");
