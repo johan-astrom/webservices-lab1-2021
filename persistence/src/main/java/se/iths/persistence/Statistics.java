@@ -6,8 +6,6 @@ import javax.persistence.*;
 @Table(name="[Statistics]")
 public class Statistics {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,27 +23,7 @@ public class Statistics {
     }
 
     public Statistics() {
-
     }
-
-
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-
-    public void setId(int id) {
-
-        this.id = id;
-    }
-
-
-    public int getId() {
-
-        return id;
-    }
-
-
 
     @Override
     public String toString() {

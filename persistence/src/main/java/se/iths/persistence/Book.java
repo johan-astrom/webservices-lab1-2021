@@ -24,36 +24,8 @@ public class Book {
         this.price = price;
     }
 
-    public long getIsbn13() {
-        return isbn13;
-    }
-
-    public void setIsbn13(long isbn13) {
-        this.isbn13 = isbn13;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     @Override
