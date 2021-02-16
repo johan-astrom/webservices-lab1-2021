@@ -8,6 +8,4 @@ public interface BookDAO {
 
     void create(long isbn13, String title, String genre, double price);
 
-
-
 }

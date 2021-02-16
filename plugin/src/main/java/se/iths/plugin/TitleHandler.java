@@ -24,15 +24,11 @@ public class TitleHandler implements UrlHandler {
 
         String result = "";
 
-        //loopar igenom boklistan, lägger till titlarna efter varandra på /title
         for (Book book : books) {
             result += book.getTitle() + "\r\n";
-
         }
 
-        //skickar url och titlarna till fileWriter
         IOhandler.FileWriter(url, result);
-
 
         httpResponse.printResponse("/title");
 

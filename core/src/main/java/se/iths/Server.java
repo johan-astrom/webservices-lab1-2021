@@ -7,11 +7,9 @@ import se.iths.spi.PluginType;
 import se.iths.spi.UrlHandler;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
-import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -20,14 +18,12 @@ public class Server {
 
     private static HttpResponse httpResponse;
     private static HttpRequest httpRequest;
-
     private static Service serviceBooks;
     private static BookDAO bookDAO;
     private static Service serviceStats;
     private static StatisticsDAO statisticsDAO;
 
-  private static Map<String, UrlHandler> route;
-
+    private static Map<String, UrlHandler> route;
 
     public static void main(String[] args) {
 
@@ -36,7 +32,6 @@ public class Server {
         statisticsDAO = new StatisticsDAOWithJPAImpl();
         serviceStats = new Service(statisticsDAO);
         httpResponse = new HttpResponse();
-
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -47,36 +42,29 @@ public class Server {
             createMap();
 
             while (true) {
-               Socket socket = serverSocket.accept();
+                Socket socket = serverSocket.accept();
                 executorService.execute(() -> handleConnection(socket));
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private static void createMap() {
 
         route = new HashMap<>();
-
         var loader = PluginLoader.findUrlHandlers();
 
-       for (var handler : loader) {
-
+        for (var handler : loader) {
             route.put(handler.getClass().getAnnotation(PluginType.class).route(), handler);
-       }
-
-
+        }
     }
 
     private static void handleConnection(Socket socket) {
 
-        try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            String headerLine = input.readLine();
-
+        try (BufferedInputStream input = new BufferedInputStream(socket.getInputStream())) {
+            String headerLine = readLine(input);
 
             String[] header = headerLine.split(" ");
 
@@ -84,28 +72,24 @@ public class Server {
 
             String url = header[1];
 
-
-
             switch (header[0]) {
 
                 case "GET":
                     isHead = false;
-                    readHeaderLines(input, false, url);
+                    readHeaderLines(input, url);
                     httpResponse = findRoute(url);
                     break;
 
                 case "HEAD":
                     isHead = true;
-                    readHeaderLines(input, false, url);
+                    readHeaderLines(input, url);
                     httpResponse = findRoute(url);
                     break;
 
                 case "POST":
-                    BufferedInputStream postInput = new BufferedInputStream(socket.getInputStream());
-                    postRequest(postInput, input, url);
-                    httpResponse = findRoute(url);
+                    postRequest(input, url);
+                    httpResponse.redirect("/postConfirmation.html");
                     break;
-
             }
 
             sendHttp(socket, isHead, httpResponse);
@@ -115,8 +99,6 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private static void sendHttp(Socket socket, boolean isHead, HttpResponse httpResponse) throws IOException {
@@ -133,40 +115,32 @@ public class Server {
 
     private static HttpResponse findRoute(String url) {
 
-        String routeUrl= url;
-        if(url.indexOf("?")!=-1){
+        String routeUrl = url;
+        if (url.indexOf("?") != -1) {
 
             routeUrl = url.split("\\?")[0];
-
         }
 
         UrlHandler urlHandler = route.get(routeUrl);
 
         httpRequest = new HttpRequest(url);
 
-        if(urlHandler == null) {
-
+        if (urlHandler == null) {
             urlHandler = route.get("fileHandler");
-
         }
 
-     httpResponse = urlHandler.handlerUrl(httpRequest, httpResponse);
-
+        httpResponse = urlHandler.handlerUrl(httpRequest, httpResponse);
 
         return httpResponse;
-
     }
 
-    // TODO: 2021-02-12 Ändra från BufferedReader till BufferedInputStream(socket.getInputStream) + flush()
-    private static void postRequest(BufferedInputStream postInput, BufferedReader input, String url) throws IOException {
-        //Plocka ut content-length/-type
-        int contentLength = readHeaderLines(input, true, url);
+    private static void postRequest(BufferedInputStream input, String url) throws IOException {
 
-        String bodyLine = input.readLine();
+        int contentLength = readHeaderLines(input, url);
+
+        String bodyLine = new String(input.readNBytes(contentLength));
 
         String[] body = bodyLine.split("&");
-
-        //System.out.println(bodyLine);
 
         long isbn13 = Long.parseLong(body[0].substring(body[0].indexOf("=") + 1));
         String title = body[1].substring(body[1].indexOf("=") + 1);
@@ -174,31 +148,24 @@ public class Server {
         double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
 
         serviceBooks.getBook().create(isbn13, title, genre, price);
+
     }
 
-    // TODO: 2021-02-12 Spara varje rad i en StringBuilder, låt metoden returnera hela. Anropa ev. writeUserToDB från annan metod.
-    private static int readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
+    private static int readHeaderLines(BufferedInputStream input, String url) throws IOException {
 
         String headerLine;
         int contentLength = 0;
 
         while (true) {
-            headerLine = input.readLine();
+            headerLine = readLine(input);
             System.out.println(headerLine);
 
-            if(headerLine.startsWith("Content-Length")){
-
-               contentLength = Integer.parseInt(headerLine.split(" ")[1]);
-
+            if (headerLine.startsWith("Content-Length")) {
+                contentLength = Integer.parseInt(headerLine.split(" ")[1]);
             }
 
-
-
-            if (headerLine.startsWith("User-Agent") && !isPost) {
-
+            if (headerLine.startsWith("User-Agent")) {
                 writeUserToDB(headerLine, url);
-
-
             }
 
             if (headerLine.isEmpty()) {
@@ -209,10 +176,25 @@ public class Server {
         return contentLength;
     }
 
-    private static void writeUserToDB(String headerLine, String url) {
-
-                serviceStats.getStatistics().create(headerLine, url);
+    public static String readLine(BufferedInputStream inputStream) throws IOException {
+        final int MAX_READ = 4096;
+        byte[] buffer = new byte[MAX_READ];
+        int bytesRead = 0;
+        while (bytesRead < MAX_READ) {
+            buffer[bytesRead++] = (byte) inputStream.read();
+            if (buffer[bytesRead - 1] == '\r') {
+                buffer[bytesRead++] = (byte) inputStream.read();
+                if (buffer[bytesRead - 1] == '\n')
+                    break;
             }
         }
+        return new String(buffer, 0, bytesRead - 2, StandardCharsets.UTF_8);
+    }
+
+    private static void writeUserToDB(String headerLine, String url) {
+
+        serviceStats.getStatistics().create(headerLine, url);
+    }
+}
 
 

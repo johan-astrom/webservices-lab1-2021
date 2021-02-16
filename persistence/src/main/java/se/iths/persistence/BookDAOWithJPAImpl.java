@@ -9,7 +9,6 @@ public class BookDAOWithJPAImpl implements BookDAO {
 
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("JPADemo");
 
-
     @Override
     public List<Book> getAllBooks() {
 

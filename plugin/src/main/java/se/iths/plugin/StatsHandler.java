@@ -34,8 +34,7 @@ public class StatsHandler implements UrlHandler {
         int books = Collections.frequency(statsCount, "/books");
         int stats = Collections.frequency(statsCount, "/stats");
 
-
-        if(httpRequest.getUrl().indexOf("?")!=-1) {
+        if(httpRequest.getUrl().contains("?")) {
             parameterReader(httpRequest, cat, index, books, stats, httpResponse);
 
         }else {
