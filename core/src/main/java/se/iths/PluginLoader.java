@@ -1,7 +1,5 @@
 package se.iths;
 
-import se.iths.persistence.Statistics;
-import se.iths.spi.StatisticsHandler;
 import se.iths.spi.UrlHandler;
 
 import java.util.ServiceLoader;

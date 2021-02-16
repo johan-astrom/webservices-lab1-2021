@@ -8,19 +8,12 @@ import se.iths.spi.UrlHandler;
 @PluginType(route = "fileHandler")
 public class FileHandler implements UrlHandler {
 
-    private String route = "fileHandler";
-
-
 
     @Override
-    public HttpResponse handlerUrl(HttpRequest httpRequest) {
-        HttpResponse httpResponse = new HttpResponse();
+    public HttpResponse handlerUrl(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.printResponse(httpRequest.getUrl());
         return httpResponse;
     }
 
-    @Override
-    public String getRoute() {
-        return route;
-    }
+
 }

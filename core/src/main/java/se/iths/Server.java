@@ -2,9 +2,7 @@ package se.iths;
 
 import se.iths.io.HttpRequest;
 import se.iths.io.HttpResponse;
-import se.iths.persistence.BookDAO;
-import se.iths.persistence.BookDAOWithJPAImpl;
-import se.iths.persistence.StatisticsDAOWithJPAImpl;
+import se.iths.persistence.*;
 import se.iths.spi.PluginType;
 import se.iths.spi.UrlHandler;
 
@@ -20,27 +18,37 @@ import java.util.concurrent.*;
 
 public class Server {
 
-    //Deklarerat en map för att hantera flera förfrågningar,
-    // som vi ska kunna nå senare i koden. Sparas i par key och value från UrlHandler, sparas som routes.
-    private static Map<String, UrlHandler> route;
+    private static HttpResponse httpResponse;
+    private static HttpRequest httpRequest;
+
+    private static Service serviceBooks;
+    private static BookDAO bookDAO;
+    private static Service serviceStats;
+    private static StatisticsDAO statisticsDAO;
+
+  private static Map<String, UrlHandler> route;
 
 
     public static void main(String[] args) {
 
-        //Trådar skapas
+        bookDAO = new BookDAOWithJPAImpl();
+        serviceBooks = new Service(bookDAO);
+        statisticsDAO = new StatisticsDAOWithJPAImpl();
+        serviceStats = new Service(statisticsDAO);
+        httpResponse = new HttpResponse();
+
+
         ExecutorService executorService = Executors.newCachedThreadPool();
 
         try {
-            //Servern startar
-            ServerSocket serverSocket = new ServerSocket(7050);
+
+            ServerSocket serverSocket = new ServerSocket(9050);
 
             createMap();
 
             while (true) {
-                //Klienten ansluter till servern, skickar socket till handleConnection();
-                Socket socket = serverSocket.accept();
+               Socket socket = serverSocket.accept();
                 executorService.execute(() -> handleConnection(socket));
-
             }
 
         } catch (IOException e) {
@@ -50,21 +58,15 @@ public class Server {
     }
 
     private static void createMap() {
-        //Initieras en hash map för våra routes
+
         route = new HashMap<>();
 
-        //Klassen PluginLoader anropar findUrlHandlers som söker plugins, sparas i
-        //en serviceloader
         var loader = PluginLoader.findUrlHandlers();
 
-        //For-each loopen stegar igenom serviceloadern och lägger in nyckel/värde i mappen
-        for (var handler : loader) {
-           // route.put(handler.getRoute(), handler);
-            route.put(handler.getClass().getAnnotation(PluginType.class).route(), handler);
+       for (var handler : loader) {
 
-            // Utrskift på vår Map både key och vart den går
-            //System.out.printf("Url "+ handler.getRoute().toString() +  " class "+ handler+"\r\n");
-        }
+            route.put(handler.getClass().getAnnotation(PluginType.class).route(), handler);
+       }
 
 
     }
@@ -82,11 +84,6 @@ public class Server {
 
             String url = header[1];
 
-
-            HttpResponse httpResponse = null;
-
-
-            //Kod för URL-parametrar
 
 
             switch (header[0]) {
@@ -135,8 +132,6 @@ public class Server {
     }
 
     private static HttpResponse findRoute(String url) {
-        //Gör en ny URL-handler-klass som hanterar filer, anropas ifall urlHandler = null (den ligger m.a.o. inte i map:en route.
-
 
         String routeUrl= url;
         if(url.indexOf("?")!=-1){
@@ -145,36 +140,17 @@ public class Server {
 
         }
 
-
-
-
         UrlHandler urlHandler = route.get(routeUrl);
-        HttpResponse httpResponse;
-        HttpRequest httpRequest = new HttpRequest(url);
 
+        httpRequest = new HttpRequest(url);
 
         if(urlHandler == null) {
 
             urlHandler = route.get("fileHandler");
 
-
         }
 
-
-            if (urlHandler==null){
-          /*  try {
-
-                //Fungerar ej..
-              //  urlHandler = new FileHandler();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-            //Ersätt med ny klass i detta package som implementerar URLHandler, anropa dess handlerUrl-metod.
-            //urlHandler = new VåranNyaKlassSomImplementerarURLHandler
-        }
-
-        httpResponse = urlHandler.handlerUrl(httpRequest);
+     httpResponse = urlHandler.handlerUrl(httpRequest, httpResponse);
 
 
         return httpResponse;
@@ -186,9 +162,7 @@ public class Server {
         //Plocka ut content-length/-type
         int contentLength = readHeaderLines(input, true, url);
 
-
         String bodyLine = input.readLine();
-
 
         String[] body = bodyLine.split("&");
 
@@ -199,16 +173,11 @@ public class Server {
         String genre = body[2].substring(body[2].indexOf("=") + 1);
         double price = Double.parseDouble(body[3].substring(body[3].indexOf("=") + 1));
 
-        //System.out.println(isbn13 + " " + title + " " + genre + " " + price);
-        // TODO: 2021-02-12 Lägg i egen klass.
-        BookDAO book = new BookDAOWithJPAImpl();
-
-        book.create(isbn13, title, genre, price);
+        serviceBooks.getBook().create(isbn13, title, genre, price);
     }
 
     // TODO: 2021-02-12 Spara varje rad i en StringBuilder, låt metoden returnera hela. Anropa ev. writeUserToDB från annan metod.
     private static int readHeaderLines(BufferedReader input, boolean isPost, String url) throws IOException {
-        //Plocka ut content-length/-type
 
         String headerLine;
         int contentLength = 0;
@@ -238,30 +207,12 @@ public class Server {
         }
 
         return contentLength;
-
     }
 
     private static void writeUserToDB(String headerLine, String url) {
-        // TODO: 2021-02-12 Lägg i egen klass.
-                StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
-                statisticsDAOWithJPA.create(headerLine, url);
-            }
 
+                serviceStats.getStatistics().create(headerLine, url);
+            }
         }
 
-
-  /*  private static void writeUserToDB(String headerLine, String url) {
-        // egen klass
-
-        for (var handler : route.values()) {
-            if (handler.getClass().getAnnotation(StatisticType.class).type().equals("/Viewers"));
-            {
-
-                StatisticsDAOWithJPAImpl statisticsDAOWithJPA = new StatisticsDAOWithJPAImpl();
-                statisticsDAOWithJPA.create(headerLine, url);
-            }
-
-        }
-    }
-   */
 

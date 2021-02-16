@@ -4,7 +4,7 @@ import se.iths.io.HttpRequest;
 import se.iths.io.HttpResponse;
 import se.iths.persistence.*;
 import se.iths.spi.PluginType;
-import se.iths.spi.StatisticsHandler;
+import se.iths.spi.UrlHandler;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,24 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//Byt ut fältet mot annotation.
+
 @PluginType(route = "/stats")
-public class ViewersHandler implements StatisticsHandler {
-
-    private String route = "/stats";
-
-    @Override
-    public int countStats() {
-        return new StatisticsDAOWithJPAImpl().getAllStatistics().size();
-    }
-
-
-
+public class StatsHandler implements UrlHandler {
 
 
     @Override
-    public HttpResponse handlerUrl(HttpRequest httpRequest) {
-
+    public HttpResponse handlerUrl(HttpRequest httpRequest, HttpResponse httpResponse) {
 
         StatisticsDAO sdao = new StatisticsDAOWithJPAImpl();
 
@@ -45,10 +34,6 @@ public class ViewersHandler implements StatisticsHandler {
         int books = Collections.frequency(statsCount, "/books");
         int stats = Collections.frequency(statsCount, "/stats");
 
-        HttpResponse httpResponse = new HttpResponse();
-        String type = null;
-
-
 
         if(httpRequest.getUrl().indexOf("?")!=-1) {
             parameterReader(httpRequest, cat, index, books, stats, httpResponse);
@@ -61,11 +46,7 @@ public class ViewersHandler implements StatisticsHandler {
                     "\r\nindex viewed: " + index + " times." +
                     "\r\nbooks viewed: " + books + " times." +
                     "\r\nstats viewed: " + stats + " times.");
-
-
         }
-
-
         return httpResponse;
     }
 
@@ -91,7 +72,6 @@ public class ViewersHandler implements StatisticsHandler {
                     httpResponse.printJsonResponse("stats viewed: " + stats + " times.");
                     break;
 
-
             }
             System.out.println(parameter.getQuery() + "--------------------------->");
         } catch (MalformedURLException e) {
@@ -99,8 +79,4 @@ public class ViewersHandler implements StatisticsHandler {
         }
     }
 
-    @Override
-    public String getRoute() {
-        return route;
-    }
 }

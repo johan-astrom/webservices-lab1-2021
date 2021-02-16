@@ -15,10 +15,8 @@ import java.util.List;
 @PluginType(route = "/title")
 public class TitleHandler implements UrlHandler {
 
-    private String route = "/title";
-
     @Override
-    public HttpResponse handlerUrl(HttpRequest httpRequest) {
+    public HttpResponse handlerUrl(HttpRequest httpRequest, HttpResponse httpResponse) {
         BookDAO bdao = new BookDAOWithJPAImpl();
         List<Book> books = bdao.getAllBooks();
 
@@ -35,17 +33,11 @@ public class TitleHandler implements UrlHandler {
         //skickar url och titlarna till fileWriter
         IOhandler.FileWriter(url, result);
 
-        HttpResponse httpResponse = new HttpResponse();
 
         httpResponse.printResponse("/title");
-        // Uppdaterat till detta dokument, det andra returnerade ej alla registreringar
-        // TODO: 2021-02-15 Ta bort dokument title.txt?
+
         return httpResponse;
     }
 
-    @Override
-    public String getRoute() {
-        return route;
-    }
 
 }
